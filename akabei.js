@@ -22,63 +22,83 @@
  * Authors: Yoshida Kurima, Junya Kaneko
  */
 
-var Akabei = function (cx, cy, speed) {
-    this.position = [cx, cy];
-    this.movingDirection = [0, 0];
-    this.speed = speed;
+var Akabei = function (radius, speed, map, row, col) {
+    Character.call(this, speed, map, row, col);
+    this.radius = radius;
 };
 
-Akabei.prototype = {
-    getCx : function() {
-        return this.position[0];
-    },
+inheritFromCharacter(Akabei);
 
-    getCy: function () {
-        return this.position[1];
-    },
+Akabei.prototype.getCx = function () {
+    return this.position.x;
+};
 
-    getSpeed: function() {
-        return this.speed;
-    },
+Akabei.prototype.getCy = function () {
+    return this.position.y;
+};
 
-    move: function(pacman) {
-        this.movingDirection[0] = this.movingDirection[1] = 0;
-        var i = Math.floor(2 * Math.random());
-        if (pacman.getPosition(i) - this.position[i] != 0) {
-            this.movingDirection[i] = (pacman.getPosition(i) - this.position[i]) / Math.abs(pacman.getPosition(i) - this.position[i]);
-            this.position[i] += this.getSpeed() * this.movingDirection[i];
-        }
-    },
+Akabei.prototype.getRadius = function () {
+    return this.radius;
+};
 
-    draw: function (ctx) {
-        cx = this.getCx();
-        cy = this.getCy();
-        RADIUS = 10;
-        BODY_H = RADIUS;
-        LEG_H = RADIUS / 5 * 2;
-        ctx.fillStyle = '#FF0000';
-        ctx.beginPath();
-        ctx.moveTo(cx - RADIUS, cy);
-        ctx.arc(cx, cy, RADIUS, Math.PI, 2 * Math.PI);
-        ctx.lineTo(cx + RADIUS, cy + BODY_H);
-        ctx.lineTo(cx + RADIUS / 3 * 2, cy + BODY_H - LEG_H);
-        ctx.lineTo(cx + RADIUS / 3, cy + BODY_H);
-        ctx.lineTo(cx, cy + BODY_H - LEG_H);
-        ctx.lineTo(cx - RADIUS / 3, cy + BODY_H);
-        ctx.lineTo(cx - RADIUS / 3 * 2, cy + BODY_H - LEG_H);
-        ctx.lineTo(cx - RADIUS, cy + BODY_H);
-        ctx.lineTo(cx - RADIUS, cy);
-        ctx.fill();
-        //ctx.stroke();
-        ctx.fillStyle = '#FFFFFF';
-        ctx.beginPath();
-        ctx.arc(cx - 20 * RADIUS / 50, cy - 4, 16 * RADIUS / 50, 0, Math.PI * 2);
-        ctx.arc(cx + 20 * RADIUS / 50, cy - 4, 16 * RADIUS / 50, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#0000FF';
-        ctx.beginPath();
-        ctx.arc(cx + (- 20 - 8) * RADIUS / 50 , cy - 4 * RADIUS / 50, 7 * RADIUS / 50, 0, Math.PI * 2);
-        ctx.arc(cx + (20 - 8) * RADIUS / 50, cy - 4 * RADIUS / 50, 7 * RADIUS / 50, 0, Math.PI * 2);
-        ctx.fill();
-    }
+Akabei.prototype.getLeft = function () {
+    return this.getCx() - this.getRadius();
+};
+
+Akabei.prototype.getTop = function () {
+    return this.getCy() - this.getRadius();
+};
+
+Akabei.prototype.getRight = function () {
+    return this.getCx() + this.getRadius();
+};
+
+
+Akabei.prototype.getBottom = function() {
+    return this.getCy() + this.getRadius();
+};
+
+//Akabei.prototype.move = function (pacman) {
+//    this.movingDirection.x = this.movingDirection.y = 0;
+//    var i = Math.floor(2 * Math.random());
+//    if (pacman.getPosition(i) - this.position[i] != 0) {
+//        this.movingDirection[i] = (pacman.getPosition(i) - this.position[i]) / Math.abs(pacman.getPosition(i) - this.position[i]);
+//        this.position[i] += this.getSpeed() * this.movingDirection[i];
+//    }
+//};
+
+Akabei.prototype.draw = function (ctx) {
+    var cx = this.getCx();
+    var cy = this.getCy();
+    var radius = this.radius;
+    var bodyHeight = radius;
+    var legHeight = radius / 5 * 2;
+    ctx.fillStyle = '#FF0000';
+    ctx.beginPath();
+    ctx.moveTo(cx - radius, cy);
+    ctx.arc(cx, cy, radius, Math.PI, 2 * Math.PI);
+    ctx.lineTo(cx + radius, cy + bodyHeight);
+    ctx.lineTo(cx + radius / 3 * 2, cy + bodyHeight - legHeight);
+    ctx.lineTo(cx + radius / 3, cy + bodyHeight);
+    ctx.lineTo(cx, cy + bodyHeight - legHeight);
+    ctx.lineTo(cx - radius / 3, cy + bodyHeight);
+    ctx.lineTo(cx - radius / 3 * 2, cy + bodyHeight - legHeight);
+    ctx.lineTo(cx - radius, cy + bodyHeight);
+    ctx.lineTo(cx - radius, cy);
+    ctx.fill();
+
+    ctx.fillStyle = '#FFFFFF';
+    var leftEyeX = cx - 20 * radius / 50;
+    var leftEyeY = cy - 4 * radius / 50;
+    var rightEyeX  = cx + 20 * radius / 50;
+    var rightEyeY = cy - 4 * radius / 50;
+    ctx.beginPath();
+    ctx.arc(leftEyeX, leftEyeY, 16 * radius / 50, 0, Math.PI * 2);
+    ctx.arc(rightEyeX, rightEyeY, 16 * radius / 50, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#0000FF';
+    ctx.beginPath();
+    ctx.arc(leftEyeX - 8 * radius / 50, leftEyeY - 4 * radius / 50, 7 * radius / 50, 0, Math.PI * 2);
+    ctx.arc(rightEyeX - 8 * radius / 50, rightEyeY - 4 * radius / 50, 7 * radius / 50, 0, Math.PI * 2);
+    ctx.fill();
 };
