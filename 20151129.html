@@ -39,6 +39,7 @@ along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
     // パックマンのインスタンスを作成。
     var pacman = new Pacman(8, 40, 30, map, 1, 1);
+    var akabei =  new Akabei(8, 30, map, 1, 2);
 
     // キャンバスをフォーカスできるように設定。
     cv.tabIndex = 1;
@@ -87,6 +88,10 @@ along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
         pacman.chew(); // パックマンに咀嚼させる。
         pacman.move(duration); // パックマンを移動させる。
         pacman.draw(ctx); // パックマンを描画。
+
+        akabei.goRight();
+        akabei.move(duration);
+        akabei.draw(ctx);
 
         previousDrawingTime = timestamp; // 描画した時刻の更新。
         window.requestAnimationFrame(mainLoop); // 次のフレームの描画をブラウザに依頼。
