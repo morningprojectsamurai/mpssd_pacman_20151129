@@ -25,6 +25,10 @@
 /**
  * キャラクタを表現するオブジェクトのコンストラクタ。
  * キャラクタが共通に持つ性質 (properties) を定義。
+ * @param speed 移動スピード (pixcel/s)
+ * @param map マップ
+ * @param row マップ上の初期位置 (行)
+ * @param col マップ上の初期位置 (列)
  * @constructor
  */
 var Character = function (speed, map, row, col) {
@@ -43,78 +47,101 @@ var Character = function (speed, map, row, col) {
 };
 
 /**
- * キャラクタが共通して持つべき機能 (method) を定義。
- * getLeft, getRight, getTop, getBottom, draw は、それぞれのキャラクタに合わせてオーバーライドすること。
- * @type {{getLeft: Function, getRight: Function, getTop: Function, getBottom: Function, getSpeed: Function, goLeft: Function, goRight: Function, goUp: Function, goDown: Function, isInWall: Function, move: Function, draw: Function}}
+ * キャラクタの左端の座標 (Pixcel)を返す。
+ * 必ずキャラクタ毎にオーバーライドすること。
+ * @method getLeft
  */
-Character.prototype = {
-    getLeft: function () {
-        throw 'getLeft method must be overridden.';
-    },
+Character.prototype.getLeft = function () {
+    throw 'getLeft method must be overridden.';
+};
 
-    getRight: function () {
-        throw 'getRight method must be overridden.';
-    },
+/**
+ * キャラクタの右端の座標 (Pixcel)を返す。
+ * 必ずキャラクタ毎にオーバーライドすること。
+ * @method getRight
+ */
+Character.prototype.getRight = function () {
+    throw 'getRight method must be overridden.';
+};
 
-    getTop: function () {
-        throw 'getTop method must be overridden.';
-    },
+/**
+ * キャラクタの上端の座標 (Pixcel)を返す。
+ * 必ずキャラクタ毎にオーバーライドすること。
+ * @method getTop
+ */
+Character.prototype.getTop = function () {
+    throw 'getTop method must be overridden.';
+};
 
-    getBottom: function () {
-        throw 'getBottom method must be overridden.';
-    },
+/**
+ * キャラクタの下端の座標 (Pixcel)を返す。
+ * 必ずキャラクタ毎にオーバーライドすること。
+ * @method getBottom
+ */
+Character.prototype.getBottom = function () {
+    throw 'getBottom method must be overridden.';
+};
 
-    getSpeed: function () {
-        return this.speed;
-    },
+Character.prototype.getSpeed = function () {
+    return this.speed;
+};
 
-    goLeft: function () {
-        this.movingDirection = {'x': -1, 'y': 0};
-    },
+Character.prototype.goLeft = function () {
+    this.movingDirection = {'x': -1, 'y': 0};
+};
 
-    goRight: function () {
-        this.movingDirection = {'x': 1, 'y': 0};
-    },
+Character.prototype.goRight = function () {
+    this.movingDirection = {'x': 1, 'y': 0};
+};
 
-    goUp: function () {
-        this.movingDirection = {'x': 0, 'y': -1};
-    },
+Character.prototype.goUp = function () {
+    this.movingDirection = {'x': 0, 'y': -1};
+};
 
-    goDown: function () {
-        this.movingDirection = {'x': 0, 'y': 1};
-    },
+Character.prototype.goDown = function () {
+    this.movingDirection = {'x': 0, 'y': 1};
+};
 
-    isInWall: function () {
-        return this.map.isWall(this.getLeft(), this.getTop()) ||
-            this.map.isWall(this.getLeft(), this.getBottom()) ||
-            this.map.isWall(this.getRight(), this.getTop()) ||
-            this.map.isWall(this.getRight(), this.getBottom())
-    },
+Character.prototype.isInWall = function () {
+    return this.map.isWall(this.getLeft(), this.getTop()) ||
+        this.map.isWall(this.getLeft(), this.getBottom()) ||
+        this.map.isWall(this.getRight(), this.getTop()) ||
+        this.map.isWall(this.getRight(), this.getBottom())
+};
 
-    move: function (duration) {
-        var previous_pos_x = this.position.x;
-        var previous_pos_y = this.position.y;
+Character.prototype.move = function (duration) {
+    var previous_pos_x = this.position.x;
+    var previous_pos_y = this.position.y;
 
-        this.position.x += (this.movingDirection.x * duration * this.getSpeed() / 1000);
+    this.position.x += (this.movingDirection.x * duration * this.getSpeed() / 1000);
 
-        if (this.isInWall()) {
-            this.position.x = previous_pos_x;
-        }
+    if (this.isInWall()) {
+        this.position.x = previous_pos_x;
+    }
 
-        this.position.y += (this.movingDirection.y * duration * this.getSpeed() / 1000);
+    this.position.y += (this.movingDirection.y * duration * this.getSpeed() / 1000);
 
-        if (this.isInWall()) {
-            this.position.y = previous_pos_y;
-        }
-    },
-
-    draw: function (ctx) {
-        throw 'draw method must be overridden.';
+    if (this.isInWall()) {
+        this.position.y = previous_pos_y;
     }
 };
 
+/**
+ * キャラクタを描画する。
+ * 必ずキャラクタ毎にオーバーライドすること。
+ * @method draw
+ */
+Character.prototype.draw = function (ctx) {
+    throw 'draw method must be overridden.';
+};
+
+/**
+ * Character のプロトタイプを子クラスに継承させるための処理を行う関数。
+ * @param childClass 作成する子クラス
+ */
 var inheritFromCharacter = function (childClass) {
-    var tempConstructor = function(){};
+    var tempConstructor = function () {
+    };
     tempConstructor.prototype = Character.prototype;
     childClass.prototype = new tempConstructor();
     childClass.prototype.constructor = childClass;
