@@ -24,6 +24,16 @@
 
 // パックマンのコンストラクタを定義。
 // パックマンは、半径、速度、移動方向、口の開き具合、口パクの速度、初期タイルの位置を属性として持つ。
+/**
+ * パックマンのコンストラクタ
+ * @param radius 半径
+ * @param speed 移動スピード(pixcel/s)
+ * @param theta 口の開き具合 (度)
+ * @param map マップ
+ * @param row マップ上の初期位置 (行)
+ * @param col マップ上の初期位置 (列)
+ * @constructor
+ */
 var Pacman = function (radius, speed, theta, map, row, col) {
     Character.call(this, speed, map, row, col);
     this.radius = radius;
