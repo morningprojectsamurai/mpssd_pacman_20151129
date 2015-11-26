@@ -47,14 +47,6 @@ inheritFromCharacter(Pacman);
 // パックマンのメソッドを定義。
 // 今のところ、メソッドはコンストラクタの持つ prototype オブジェクトのメソッドとして
 // 定義すると覚える。
-Pacman.prototype.getCx = function () {
-    return this.position.x;
-};
-
-Pacman.prototype.getCy = function () {
-    return this.position.y;
-};
-
 Pacman.prototype.getRadius = function () {
     return this.radius;
 };
