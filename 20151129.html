@@ -81,12 +81,10 @@ along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
         map.draw(ctx); // マップを描画。
 
-        pacman.chew(); // パックマンに咀嚼させる。
         pacman.move(duration); // パックマンを移動させる。
         pacman.draw(ctx); // パックマンを描画。
 
         for (var i = 0; i < akabeis.length; i++) {
-            akabeis[i].decideDirection(duration);
             akabeis[i].move(duration);
             akabeis[i].killPacman();
             akabeis[i].draw(ctx);

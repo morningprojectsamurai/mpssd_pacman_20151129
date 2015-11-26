@@ -70,6 +70,11 @@ Akabei.prototype.decideDirection = function (duration) {
     }
 };
 
+Akabei.prototype.move = function (duration) {
+    this.decideDirection(duration);
+    Character.prototype.move.call(this, duration);
+};
+
 Akabei.prototype.killPacman = function() {
     if (this.getDistance(this.pacman) <= this.radius) {
         this.pacman.die();

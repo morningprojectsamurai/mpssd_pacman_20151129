@@ -79,6 +79,11 @@ Pacman.prototype.chew =  function () {
     return this.theta;
 };
 
+Pacman.prototype.move = function (duration) {
+    this.chew();
+    Character.prototype.move.call(this, duration);
+};
+
 Pacman.prototype.draw =  function (ctx) {
     ctx.strokeStyle = "#FF0000";
     ctx.fillStyle = "#FF0000";
