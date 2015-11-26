@@ -35,15 +35,27 @@ var Character = function (speed, map, row, col) {
     // タイルベースの移動に必要な情報
     this.map = map;
 
-    var rect = this.map.getTilePosition(row, col);
+    var leftTop = this.map.getTileLeftTop(row, col);
 
     // ピクセルベースの移動の描画に必要な情報
     this.position = {
-        'x': Math.floor(rect.left + this.map.getTileWidth() / 2),
-        'y': Math.floor(rect.top + this.map.getTileHeight() / 2)
+        'x': Math.floor(leftTop.left + this.map.getTileWidth() / 2),
+        'y': Math.floor(leftTop.top + this.map.getTileHeight() / 2)
     };
     this.movingDirection = {'x': 0, 'y': 0};
+    this.nextMovingDirection = {'x': 0, 'y': 0};
     this.speed = speed;
+    this.movingDistance = 0;
+};
+
+Character.prototype.toString = function () {
+    var str = '';
+    str += 'Current position: (' + this.position.x + ', ' + this.position.y + ')\n';
+    str += 'Moving direction: (' + this.movingDirection.x + ', ' + this.movingDirection.y + ')\n';
+    str += 'Next moving direction: (' + this.nextMovingDirection.x + ', ' + this.nextMovingDirection.y + ')\n';
+    str += 'Speed: ' + this.speed + '\n';
+    str += 'Moving distance: ' + this.movingDistance + '\n';
+    return str;
 };
 
 /**
@@ -87,42 +99,91 @@ Character.prototype.getSpeed = function () {
 };
 
 Character.prototype.goLeft = function () {
-    this.movingDirection = {'x': -1, 'y': 0};
+    this.nextMovingDirection = {'x': -1, 'y': 0};
 };
 
 Character.prototype.goRight = function () {
-    this.movingDirection = {'x': 1, 'y': 0};
+    this.nextMovingDirection = {'x': 1, 'y': 0};
 };
 
 Character.prototype.goUp = function () {
-    this.movingDirection = {'x': 0, 'y': -1};
+    this.nextMovingDirection = {'x': 0, 'y': -1};
 };
 
 Character.prototype.goDown = function () {
-    this.movingDirection = {'x': 0, 'y': 1};
+    this.nextMovingDirection = {'x': 0, 'y': 1};
 };
 
-Character.prototype.isInWall = function () {
-    return this.map.isWall(this.getLeft(), this.getTop()) ||
-        this.map.isWall(this.getLeft(), this.getBottom()) ||
-        this.map.isWall(this.getRight(), this.getTop()) ||
-        this.map.isWall(this.getRight(), this.getBottom())
+Character.prototype.isMovingHorizontally = function () {
+    return this.movingDirection.x != 0;
+};
+
+Character.prototype.isMovingVertically = function() {
+    return this.movingDirection.y != 0;
+};
+
+Character.prototype.stops = function() {
+    return this.movingDirection.x == 0 && this.movingDirection.y == 0;
+};
+
+Character.prototype.isNextMovingDirectionOk = function () {
+    console.log('The current tile is ' + this.map.getTile(this.position.x, this.position.y).row + ', ' + this.map.getTile(this.position.x, this.position.y).col + ', ' + this.map.getTile(this.position.x, this.position.y).kind);
+    if (this.nextMovingDirection.x < 0){
+        console.log('Is the left block a wall? ' + this.map.isLeftBlockWall(this.position.x, this.position.y));
+        return !this.map.isLeftBlockWall(this.position.x, this.position.y);
+    }else if (this.nextMovingDirection.x > 0) {
+        console.log('Is the right block a wall? ' + this.map.isRightBlockWall(this.position.x, this.position.y));
+        return !this.map.isRightBlockWall(this.position.x, this.position.y);
+    }else if (this.nextMovingDirection.y < 0 ) {
+        console.log('Is the above block a wall? ' + this.map.isAboveBlockWall(this.position.x, this.position.y));
+        return !this.map.isAboveBlockWall(this.position.x, this.position.y);
+    }else if (this.nextMovingDirection.y > 0 ) {
+        console.log('Is the below block a wall? ' + this.map.isBelowBlockWall(this.position.x, this.position.y));
+        return !this.map.isBelowBlockWall(this.position.x, this.position.y);
+    }else{
+        return true;
+    }
 };
 
 Character.prototype.move = function (duration) {
-    var previous_pos_x = this.position.x;
-    var previous_pos_y = this.position.y;
+    var arrived = false;
+    var distance = duration * this.getSpeed() / 1000;
 
-    this.position.x += (this.movingDirection.x * duration * this.getSpeed() / 1000);
-
-    if (this.isInWall()) {
-        this.position.x = previous_pos_x;
+    if (this.stops()){
+        arrived = true;
+    } else if (this.isMovingHorizontally()) {
+        this.movingDistance += distance;
+        if (this.movingDistance >= this.map.getTileWidth()) {
+            this.movingDistance = 0;
+            arrived = true;
+        } else {
+            this.position.x += this.movingDirection.x * distance;
+        }
+    } else if (this.isMovingVertically()){
+        this.movingDistance += distance;
+        if (this.movingDistance >= this.map.getTileHeight()) {
+            this.movingDistance = 0;
+            arrived = true;
+        } else {
+            this.position.y += this.movingDirection.y * distance;
+        }
+    } else {
+        throw 'Unexpected moving.';
     }
 
-    this.position.y += (this.movingDirection.y * duration * this.getSpeed() / 1000);
-
-    if (this.isInWall()) {
-        this.position.y = previous_pos_y;
+    if (arrived) {
+        this.position = this.map.getTileCenter(this.position.x, this.position.y);
+        if (this.isNextMovingDirectionOk()) {
+            console.log('Is next moving direction OK? ' + this.isNextMovingDirectionOk());
+            this.movingDirection.x = this.nextMovingDirection.x;
+            this.movingDirection.y = this.nextMovingDirection.y;
+        }else {
+            this.nextMovingDirection.x = this.movingDirection.x;
+            this.nextMovingDirection.y = this.movingDirection.y;
+            if(!this.isNextMovingDirectionOk()){
+                this.movingDirection = {'x': 0, 'y': 0};
+            }
+        }
     }
 };
 
