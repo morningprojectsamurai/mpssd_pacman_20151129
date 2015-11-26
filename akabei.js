@@ -76,7 +76,7 @@ Akabei.prototype.move = function (duration) {
 };
 
 Akabei.prototype.killPacman = function() {
-    if (this.getDistance(this.pacman) <= this.radius) {
+    if (this.getDistance(this.pacman) <= Math.max(this.radius, this.pacman.radius)) {
         this.pacman.die();
     }
 };
