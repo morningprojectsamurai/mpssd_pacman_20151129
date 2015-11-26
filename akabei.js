@@ -22,9 +22,11 @@
  * Authors: Yoshida Kurima, Junya Kaneko
  */
 
-var Akabei = function (radius, speed, map, row, col) {
+var Akabei = function (radius, speed, color, pacman, map, row, col) {
     Character.call(this, speed, map, row, col);
     this.radius = radius;
+    this.color = color;
+    this.pacman = pacman;
 };
 
 inheritFromCharacter(Akabei);
@@ -54,18 +56,27 @@ Akabei.prototype.getRight = function () {
 };
 
 
-Akabei.prototype.getBottom = function() {
+Akabei.prototype.getBottom = function () {
     return this.getCy() + this.getRadius();
 };
 
-//Akabei.prototype.move = function (pacman) {
-//    this.movingDirection.x = this.movingDirection.y = 0;
-//    var i = Math.floor(2 * Math.random());
-//    if (pacman.getPosition(i) - this.position[i] != 0) {
-//        this.movingDirection[i] = (pacman.getPosition(i) - this.position[i]) / Math.abs(pacman.getPosition(i) - this.position[i]);
-//        this.position[i] += this.getSpeed() * this.movingDirection[i];
-//    }
-//};
+Akabei.prototype.decideDirection = function (duration) {
+    if (Math.random() < 0.5){
+        if (this.pacman.getCx() - this.getCx() < 0){
+            this.nextMovingDirection.x = -1;
+        } else {
+            this.nextMovingDirection.x = 1;
+        }
+        this.nextMovingDirection.y = 0;
+    } else{
+        this.nextMovingDirection.x = 0;
+        if (this.pacman.getCy() - this.getCy() < 0) {
+            this.nextMovingDirection.y = -1;
+        }else {
+            this.nextMovingDirection.y = 1;
+        }
+    }
+};
 
 Akabei.prototype.draw = function (ctx) {
     var cx = this.getCx();
@@ -73,7 +84,7 @@ Akabei.prototype.draw = function (ctx) {
     var radius = this.radius;
     var bodyHeight = radius;
     var legHeight = radius / 5 * 2;
-    ctx.fillStyle = '#FF0000';
+    ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.moveTo(cx - radius, cy);
     ctx.arc(cx, cy, radius, Math.PI, 2 * Math.PI);
@@ -90,7 +101,7 @@ Akabei.prototype.draw = function (ctx) {
     ctx.fillStyle = '#FFFFFF';
     var leftEyeX = cx - 20 * radius / 50;
     var leftEyeY = cy - 4 * radius / 50;
-    var rightEyeX  = cx + 20 * radius / 50;
+    var rightEyeX = cx + 20 * radius / 50;
     var rightEyeY = cy - 4 * radius / 50;
     ctx.beginPath();
     ctx.arc(leftEyeX, leftEyeY, 16 * radius / 50, 0, Math.PI * 2);
