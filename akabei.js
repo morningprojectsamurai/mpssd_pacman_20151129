@@ -31,14 +31,6 @@ var Akabei = function (radius, speed, color, pacman, map, row, col) {
 
 inheritFromCharacter(Akabei);
 
-Akabei.prototype.getCx = function () {
-    return this.position.x;
-};
-
-Akabei.prototype.getCy = function () {
-    return this.position.y;
-};
-
 Akabei.prototype.getRadius = function () {
     return this.radius;
 };
@@ -75,6 +67,12 @@ Akabei.prototype.decideDirection = function (duration) {
         }else {
             this.nextMovingDirection.y = 1;
         }
+    }
+};
+
+Akabei.prototype.killPacman = function() {
+    if (this.getDistance(this.pacman) <= this.radius) {
+        this.pacman.die();
     }
 };
 
